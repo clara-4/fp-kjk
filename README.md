@@ -1,5 +1,8 @@
 # fp-kjk
 
 ## Topologi
-![image](https://github.com/user-attachments/assets/1f951f5d-d4a0-478b-8789-59f323a25765)
+<img width="619" alt="image" src="https://github.com/user-attachments/assets/3f2db92d-cf01-43e5-8620-9ff8f40fbd12" />
+## Topologi Subnetting
+<img width="539" alt="image" src="https://github.com/user-attachments/assets/5b283561-d867-4f7c-9cf2-98b0d18a8745" />
+
 
