@@ -9,7 +9,7 @@
 | Angella Christie         | 5027221047 |
 | Monika Damelia H         | 5027221011 |
 
-
+# 1. Simulasi Jaringan
 
 ## Topologi
 <img width="619" alt="image" src="https://github.com/user-attachments/assets/3f2db92d-cf01-43e5-8620-9ff8f40fbd12" />
@@ -206,4 +206,58 @@ route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.66
 ```
 route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.67
 ```
+
+# 2. Analisis risiko Berdasarkan standar ISO 27001:2022.
+
+### A. Fokus analisis risiko
+
+1. Firewall Aktif
+2. VLAN
+3. ACL (Access Control List)
+4. IDS/IPS menggunakan Snort
+
+### B. Identifikasi Aset
+
+| ID Aset | Lokasi     | Fungsi                             |
+|---------|------------|------------------------------------|
+| A1      | Gedung Riset Center DPTSI | Menghubungkan semua segmen jaringan |
+| A2      | Perpustakaan lantai 6 | Menyediakan layanan web internal |
+| A3      | Lantai 7 | Menyediakan koneksi Wi-Fi ke 4 kelas |
+| A4      | Lantai 9	 | 	Menghubungkan lab 1 dan lab 2 |
+| A5      | Router atau server IDS | Memantau dan mencegah serangan siber |
+
+### C. Ancaman dan Kerentanan
+**Ancaman Umum**
+
+|Kode Ancaman	| Ancaman	| Deskripsi                           |
+|---------------|------------|------------------------------------|
+|T1 |	Akses Tidak Sah |	Akses tidak sah ke jaringan atau perangkat penting. |
+|T2	| Serangan DDoS	| Trafik berlebih yang mengganggu layanan web server. |
+|T3	| Serangan Lateral |	Penyebaran serangan antar VLAN tanpa batasan akses. |
+|T4	| Port Scanning & Reconnaissance	| Pemindaian port untuk menemukan kerentanan pada server atau perangkat. |
+|T5	| Malware dan Exploit	| Penyebaran malware ke jaringan internal (kelas, lab, server). |
+
+
+**Kerentanan**
+
+| Kode Kerentanan | Kerentanan     | Deskripsi                             |
+|---------|------------|------------------------------------|
+| V1	| Firewall Tidak Optimal	| Aturan firewall kurang ketat, memungkinkan akses berbahaya dari luar jaringan. |
+| V2	| ACL Tidak Diterapkan |	Tidak ada pembatasan trafik antar VLAN, memungkinkan serangan lateral. |
+| V3	| Segmentasi VLAN Kurang |	Jaringan tidak dipisahkan secara efektif, memudahkan serangan menyebar. |
+|V4	    | Tidak Ada IDS/IPS	| Tidak ada sistem untuk mendeteksi atau mencegah serangan dalam jaringan. |
+| V5	| Kebocoran Trafik Tidak Sah	| Trafik yang tidak sah dapat mengakses layanan kritis seperti server. |
+
+### D. Analisis Risiko
+
+| ID Risiko |	Aset Terdampak	| Ancaman	| Kerentanan	| Dampak	| Tingkat Risiko |	Kontrol Mitigasi |
+|---------|------------|------------|-------|---------|------------|------------|
+|R1	| Server (A2)	| Akses Tidak Sah (T1)|	Firewall Tidak Optimal |	Layanan web diretas dan data bocor.|	Tinggi|	Aktifkan Firewall, buka hanya port 80/443 yang perlu.|
+|R2|	Server (A2)|	Serangan DDoS (T2)|	Firewall Tidak Optimal|	Layanan web terganggu (down).	| Tinggi|	Aturan firewall untuk membatasi trafik berlebihan.|
+|R3	| Switch VLAN (A3, A4)|	Serangan Lateral (T3)|	ACL Tidak Diterapkan|	Penyebaran malware ke segmen lain.|	Tinggi| 	Terapkan ACL untuk membatasi akses antar VLAN.|
+|R4 |	Switch VLAN (A3, A4)|	Port Scanning (T4)|	Firewall Tidak Optimal|	Informasi port digunakan untuk eksploitasi.|	Sedang	| Atur firewall untuk blokir trafik port scanning.|
+|R5	| Semua Segmen|	Malware dan Exploit (T5)|	Tidak Ada IDS/IPS |	Kerusakan sistem dan pencurian data. |	Tinggi	| Terapkan IDS/IPS menggunakan Snort. |
+|R6	|Trafik Antar VLAN	| Kebocoran Trafik (T1)	| Segmentasi VLAN Kurang|	Akses tidak sah antar jaringan.	| Sedang|	Terapkan segmentasi VLAN yang ketat.|
+
+
 
