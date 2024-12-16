@@ -48,11 +48,13 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 
+#perpus
 auto eth1
 iface eth1 inet static
     address 192.243.1.77
     netmask 255.255.255.252
 
+#tw2
 auto eth2
 iface eth2 inet static
     address 192.243.1.65
@@ -96,6 +98,7 @@ iface eth0 inet static
     netmask 255.255.255.248
     gateway 192.243.1.65
 
+#lab
 auto eth1
 iface eth1 inet static
     address 192.243.1.1
@@ -131,6 +134,7 @@ iface eth0 inet static
     netmask 255.255.255.248
     gateway 192.243.1.65
 
+#kelas
 auto eth1
 iface eth1 inet static
     address 192.243.0.1
@@ -177,22 +181,25 @@ iface eth0 inet static
 
 ### dptsi (A1-A3)
 ```
-route add -net 192.243.1.76 netmask 255.255.255.252 gw 192.243.1.77
-route add -net 192.243.1.64 netmask 255.255.255.248 gw 192.243.1.65
+route add -net 192.243.1.72 netmask 255.255.255.252 gw 192.243.1.78
+
+#ke tw2
+route add -net 192.243.1.0  netmask 255.255.255.192 gw 192.243.1.66
+route add -net 192.243.0.0  netmask 255.255.255.0   gw 192.243.1.67
 ```
 
 ### perpus-6 
 ```
-route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.78
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.77
 ```
 
 ### lantai9 
 ```
-route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.66
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 ```
 
 ### lantai7 
 ```
-route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.67
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 ```
 
