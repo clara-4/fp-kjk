@@ -1,4 +1,15 @@
-# fp-kjk
+# Final Project Keamanan Jaringan Komputer (D)
+# Kelompok 2
+
+| Nama                     | NRP        |
+|--------------------------|------------|
+| Atha Rahma               | 5027221030 |
+| Jeany Aurellia Putri D   | 5027221008 |
+| Clara Valentina          | 5027221016 |
+| Angella Christie         | 5027221047 |
+| Monika Damelia H         | 5027221011 |
+
+
 
 ## Topologi
 <img width="619" alt="image" src="https://github.com/user-attachments/assets/3f2db92d-cf01-43e5-8620-9ff8f40fbd12" />
