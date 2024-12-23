@@ -259,12 +259,60 @@ route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 
 | ID Risiko |	Aset Terdampak	| Ancaman	| Kerentanan	| Dampak	| Tingkat Risiko |	Kontrol Mitigasi |
 |---------|------------|------------|-------|---------|------------|------------|
-|R1	| Server (A2)	| Akses Tidak Sah (T1)|	Firewall Tidak Optimal |	Layanan web diretas dan data bocor.|	Tinggi|	Aktifkan Firewall, buka hanya port 80/443 yang perlu.|
-|R2|	Server (A2)|	Serangan DDoS (T2)|	Firewall Tidak Optimal|	Layanan web terganggu (down).	| Tinggi|	Aturan firewall untuk membatasi trafik berlebihan.|
-|R3	| Switch VLAN (A3, A4)|	Serangan Lateral (T3)|	ACL Tidak Diterapkan|	Penyebaran malware ke segmen lain.|	Tinggi| 	Terapkan ACL untuk membatasi akses antar VLAN.|
-|R4 |	Switch VLAN (A3, A4)|	Port Scanning (T4)|	Firewall Tidak Optimal|	Informasi port digunakan untuk eksploitasi.|	Sedang	| Atur firewall untuk blokir trafik port scanning.|
-|R5	| Semua Segmen|	Malware dan Exploit (T5)|	Tidak Ada IDS/IPS |	Kerusakan sistem dan pencurian data. |	Tinggi	| Terapkan IDS/IPS menggunakan Snort. |
-|R6	|Trafik Antar VLAN	| Kebocoran Trafik (T1)	| Segmentasi VLAN Kurang|	Akses tidak sah antar jaringan.	| Sedang|	Terapkan segmentasi VLAN yang ketat.|
+|R1	| Server (A2)	| Akses Tidak Sah (T1)|	Firewall Tidak Optimal |	Data pada layanan web internal rentan bocor.|	Tinggi|	**Batasi Akses ke Server dari IP Tertentu**: Konfigurasi firewall agar hanya IP tertentu yang dapat mengakses server.|
+|R2|	Server (A2)|	Serangan DDoS (T2)|	Firewall Tidak Optimal|	Gangguan layanan web server.	| Tinggi|	**Batasi Akses Satu IP**: Atur firewall untuk hanya mengizinkan satu koneksi aktif per IP untuk mencegah penyalahgunaan.|
+|R3	| Server (A2)|	Port Scanning (T4)|	Firewall Tidak Optimal|	Informasi port digunakan untuk eksploitasi.|	Tinggi| 	**Blokir IP jika terdeteksi nmap atau port scanning**: Konfigurasikan firewall untuk mendeteksi pola scanning dan memblokir IP tersebut.|
+
+# 3. Implementasi Teknik Keamanan Jaringan Komputer berdasarkan Analisis Resiko
+
+### Batasi Akses ke Server dari IP Tertentu
+- Hanya izinkan IP tertentu yang memiliki akses ke server melalui pengaturan firewall.
+
+![Screenshot 2024-12-23 194338](https://github.com/user-attachments/assets/127025a4-91f9-4c8a-b82d-5f0f4f1a223a)
+
+### Blokir Akses Satu IP
+- Konfigurasi firewall atau server untuk hanya mengizinkan satu koneksi aktif dari satu IP. Hal ini gapat mengurangi resiko penggunaan berlebihan oleh IP tertentu yang berpotensi melakukan serangan seperti DDoS.
+
+![Screenshot 2024-12-23 194717](https://github.com/user-attachments/assets/2ab24ee0-bd60-472f-a799-5fb7cb5c2da3)
+
+![image](https://github.com/user-attachments/assets/2b71fe44-f7b3-4149-9db4-a22b039cd222)
+
+![image](https://github.com/user-attachments/assets/65e8160b-ea59-4826-bb6d-5274e9051509)
 
 
+### Blokir IP jika Terdeteksi NMAP atau Port Scanning 
+- Tambahkan aturan deteksi scanning di firewall. Jika terdeteksi pola scanning dari alat seperti nmap, IP tersebut langsung diblokir secara otomatis dalam periode tertentu
 
+# 4. Bentuk Serangan untuk Uji Coba Teknik Keamanan Jaringan Komputer 
+
+### Batasi Akses ke Server dari IP Tertentu
+- Pada client 704, tidak dapat melakukan nc pada server khususnya port 22 karena IP 704 sudah di block oleh server.
+
+![Screenshot 2024-12-23 194535](https://github.com/user-attachments/assets/73059c17-bba1-4aba-ae1e-81e300c6eb26)
+
+- Sedangkan pada client Lab1 berhasil melakukan nc dan dapat mengirimkan pesan dari client ke server.
+
+![Screenshot 2024-12-23 194437](https://github.com/user-attachments/assets/6ae972ec-c0ed-461a-8a92-01c23ea3cafd)
+
+![Screenshot 2024-12-23 194339](https://github.com/user-attachments/assets/9dd02de2-3b7d-4368-9782-0008e2bec3ba)
+
+- Melakukan curl IP server pada port 80 di kedua client
+
+![Screenshot 2024-12-23 194817](https://github.com/user-attachments/assets/c0f7b3cf-3332-4601-bc60-b7cc84952e75)
+
+![Screenshot 2024-12-23 194849](https://github.com/user-attachments/assets/de19f47b-bb1a-487b-87a0-b9cc31856e53)
+ 
+
+### Blokir Akses Satu IP
+
+- Statistik untuk hasil penangkapan paket jaringan pada client 704 dan Lab 1
+
+![Screenshot 2024-12-23 194717](https://github.com/user-attachments/assets/9382b5e5-b1e0-4b0c-9ac9-cfc88574d6ec)
+
+![Screenshot 2024-12-23 194755](https://github.com/user-attachments/assets/a67076ab-0259-4342-b087-3cccf42f2a69)
+
+### Blokir IP jika Terdeteksi NMAP atau Port Scanning 
+
+- Melakukan NMAP untuk scanning IP server dan memastikan server client terblokir setelah melakukan NMAP
+
+![Screenshot 2024-12-23 195117](https://github.com/user-attachments/assets/abbe8e91-8040-4a91-a389-a2f715c2504e)
