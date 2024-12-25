@@ -55,7 +55,7 @@ Kontrol Akses pada Port 22 (SSH): ACL digunakan untuk mengontrol siapa saja yang
 
 Kontrol Akses Jaringan: Selain kontrol di tingkat aplikasi (seperti port 22 dan 80), ACL juga diterapkan untuk mengontrol akses ke subnet dan jaringan yang lebih besar dengan menentukan rute yang dapat diakses antar subnet (misalnya, ```route add -net 192.243.1.72 netmask 255.255.255.252 gw 192.243.1.78```).
 
-3. Segmentasi Jaringan
+#### 3. Segmentasi Jaringan
 Segmentasi jaringan adalah proses membagi jaringan besar menjadi beberapa segmen atau subnet yang lebih kecil untuk meningkatkan kinerja dan keamanan. Dengan membagi jaringan, akses antara berbagai bagian jaringan dapat terkontrol dengan baik, membatasi potensi penyebaran ancaman, dan memastikan bahwa hanya pihak yang berwenang yang bisa mengakses sumber daya tertentu.
 
 Subnetting pada Jaringan: Berbagai perangkat dikelompokkan ke dalam subnet yang terpisah. Misalnya, perangkat di jaringan 192.243.1.0/26 dipisahkan dari jaringan lain, dan ada pembagian lebih lanjut seperti di jaringan 192.243.0.0/24 untuk membatasi komunikasi antara jaringan yang berbeda.
