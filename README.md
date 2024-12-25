@@ -213,15 +213,101 @@ route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 ```
 route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 ```
+### Server
+```
+echo "nameserver 192.168.122.1" > /etc/resolv.conf
+apt-get update
+apt install apache2 -y
+service apache2 start
+apt install apache2-utils
+
+# Aturan SSH: Terima hanya dari IP tertentu 
+iptables -A INPUT -p tcp --dport 22 -s 192.243.1.2 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -s 192.243.1.3 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j REJECT
+
+# Aturan HTTP: Batasi koneksi baru jika melebihi 10 khusus untuk port 80 dapat diakses oleh semua client
+iptables -A INPUT -p tcp --dport 80 -m conntrack --ctstate NEW -m connlimit --connlimit-above 10 -j REJECT --reject-with tcp-reset
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+# Blokir NULL scan (tidak ada flag TCP yang diset)
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+# Blokir XMAS scan (semua flag TCP diset)
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+# Blokir FIN scan (hanya flag FIN diset)
+iptables -A INPUT -p tcp --tcp-flags ALL FIN -j DROP
+
+# Deteksi dan blokir pemindaian port (SYN flood atau scanning)
+iptables -A INPUT -p tcp --syn -m multiport --dports 1:65535 -m conntrack --ctstate NEW \
+         -m recent --set --name PORTSCAN --rsource
+iptables -A INPUT -p tcp --syn -m multiport --dports 1:65535 -m conntrack --ctstate NEW \
+         -m recent --update --seconds 60 --hitcount 10 --name PORTSCAN --rsource \
+         -j LOG --log-prefix "PORTSCAN DETECTED: "
+iptables -A INPUT -m recent --rcheck --seconds 60 --hitcount 10 --name PORTSCAN --rsource \
+         -j DROP
+```
+### lab1
+```
+echo "nameserver 192.168.122.1" > /etc/resolv.conf
+apt-get update
+apt install netcat
+apt install apache2-utils
+```
+### 701
+```
+echo "nameserver 192.168.122.1" > /etc/resolv.conf
+apt-get update
+apt install netcat
+apt install apache2-utils
+```
+## Configurasi Tambahan
+### lab1
+uji port
+- port 80
+`curl http://192.243.1.74:80`
+
+- port 22
+`echo "Hello from client!" | nc 192.243.1.74 22`
+
+uji batas akses (limit akses per user)
+```
+for i in {1..20}; do curl -s -o /dev/null -w "%{http_code}\n" http://192.243.1.74/; sleep 0.01; done
+```
+
+
+### 701
+uji port
+- port 80 :
+`curl http://192.243.1.74:80`
+
+- port 22 :
+`echo "Hello from client!" | nc 192.243.1.74 22`
+
+uji batas akses (limit akses per user)
+```
+for i in {1..20}; do curl -s -o /dev/null -w "%{http_code}\n" http://192.243.1.74/; sleep 0.01; done
+```
+
+uji scan
+```
+nmap 192.243.1.74
+```
+### server
+uji batas akses (limit akses per user)
+```
+tcpdump -i eth0 port 80
+```
+
 
 # 2. Analisis risiko Berdasarkan standar ISO 27001:2022.
 
 ### A. Fokus analisis risiko
 
 1. Firewall Aktif
-2. VLAN
-3. ACL (Access Control List)
-4. IDS/IPS menggunakan Snort
+2. ACL (Access Control List)
+3. Segmentasi jaringan
 
 ### B. Identifikasi Aset
 
@@ -236,24 +322,25 @@ route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.243.1.65
 ### C. Ancaman dan Kerentanan
 **Ancaman Umum**
 
-|Kode Ancaman	| Ancaman	| Deskripsi                           |
-|---------------|------------|------------------------------------|
-|T1 |	Akses Tidak Sah |	Akses tidak sah ke jaringan atau perangkat penting. |
-|T2	| Serangan DDoS	| Trafik berlebih yang mengganggu layanan web server. |
-|T3	| Serangan Lateral |	Penyebaran serangan antar VLAN tanpa batasan akses. |
-|T4	| Port Scanning & Reconnaissance	| Pemindaian port untuk menemukan kerentanan pada server atau perangkat. |
-|T5	| Malware dan Exploit	| Penyebaran malware ke jaringan internal (kelas, lab, server). |
-
+| **Kode Ancaman** | **Ancaman**             | **Deskripsi**                                                                                                                                                 |
+|-------------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| A-01             | Unauthorized Access    | Ancaman akses tidak sah melalui port yang terbuka pada server (misalnya, SSH pada port 22).                                                                  |
+| A-02             | Denial of Service (DoS) | Serangan yang mencoba membanjiri server dengan koneksi HTTP baru sehingga layanan menjadi tidak responsif.                                                   |
+| A-03             | Port Scanning          | Upaya pemetaan port terbuka pada server untuk menemukan layanan yang dapat dieksploitasi.                                                                    |
+| A-04             | XMAS Scan              | Serangan menggunakan paket dengan semua flag TCP diatur untuk mendeteksi port terbuka atau layanan yang rentan.                                              |
+| A-05             | NULL Scan              | Serangan menggunakan paket tanpa flag TCP untuk melewati firewall yang kurang dikonfigurasi.                                                                |
+| A-06             | SYN Flood              | Serangan yang memanfaatkan banyak koneksi SYN baru untuk membanjiri server dan mengganggu konektivitas.|
 
 **Kerentanan**
-
-| Kode Kerentanan | Kerentanan     | Deskripsi                             |
-|---------|------------|------------------------------------|
-| V1	| Firewall Tidak Optimal	| Aturan firewall kurang ketat, memungkinkan akses berbahaya dari luar jaringan. |
-| V2	| ACL Tidak Diterapkan |	Tidak ada pembatasan trafik antar VLAN, memungkinkan serangan lateral. |
-| V3	| Segmentasi VLAN Kurang |	Jaringan tidak dipisahkan secara efektif, memudahkan serangan menyebar. |
-|V4	    | Tidak Ada IDS/IPS	| Tidak ada sistem untuk mendeteksi atau mencegah serangan dalam jaringan. |
-| V5	| Kebocoran Trafik Tidak Sah	| Trafik yang tidak sah dapat mengakses layanan kritis seperti server. |
+| **Kode Kerentanan** | **Kerentanan**                   | **Deskripsi**                                                                                                                                       |
+|----------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| V-01                | Access Control Implementation   | Penerapan kontrol akses pada port 22 (SSH), yang hanya menerima koneksi dari alamat IP tertentu untuk mencegah akses tidak sah.                     |
+| V-02                | Firewall Rules                  | Firewall dikonfigurasi untuk menolak koneksi pada port 22 selain dari IP yang diizinkan, serta menerapkan aturan pembatasan koneksi pada port 80.    |
+| V-03                | Port Scanning Defense           | Firewall dikonfigurasi untuk mendeteksi dan memblokir aktivitas pemindaian port menggunakan teknik SYN flood atau scan lainnya.                      |
+| V-04                | XMAS Scan Mitigation            | Firewall dikonfigurasi untuk memblokir paket dengan semua flag TCP diatur (XMAS scan).                                                              |
+| V-05                | NULL Scan Mitigation            | Firewall dikonfigurasi untuk memblokir paket tanpa flag TCP yang disetel (NULL scan).                                                               |
+| V-06                | SYN Flood Mitigation            | Firewall menggunakan aturan untuk mendeteksi dan memblokir koneksi SYN baru yang mencurigakan dalam jumlah besar.                                   |
+| V-07                | Rate Limiting Implementation    | Pembatasan koneksi baru pada port 80 diterapkan untuk mencegah penyalahgunaan sumber daya dengan koneksi yang berlebihan.                           |
 
 ### D. Analisis Risiko
 
