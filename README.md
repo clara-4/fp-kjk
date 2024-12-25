@@ -37,11 +37,32 @@ Koneksi ke Awan (Internet)
 Seluruh jaringan gedung terhubung ke jaringan eksternal (Internet) melalui NAT yang dikelola di router utama DPTSI.
 
 ### Keamanan Jaringan:
-#### Firewall
-Firewall yang terpasang di router utama DPTSI dirancang untuk memfilter lalu lintas data dan mencegah akses tidak sah ke jaringan internal, sesuai dengan prinsip pengelolaan risiko dalam ISO 27001:2022.
+#### 1. Firewall Aktif
+Firewall adalah komponen utama dalam menjaga keamanan jaringan dengan cara memantau dan mengontrol lalu lintas yang masuk dan keluar dari sistem. Firewall (melalui penggunaan iptables) diterapkan untuk membatasi dan mengontrol akses ke server dengan cara yang sangat ketat. Berikut adalah beberapa aturan yang diterapkan pada firewall:
 
-#### Akses Internal Terbatas
-Server di lantai 6 hanya dapat diakses dari jaringan internal untuk menjaga kerahasiaan dan integritas data.
+Pembatasan Akses SSH (port 22): Aturan firewall diterapkan untuk menerima koneksi SSH hanya dari alamat IP tertentu ```192.243.1.2``` dan ```192.243.1.3```, serta menolak koneksi dari IP lainnya. Digunakan untuk mencegah akses tidak sah ke server melalui port SSH.
+
+Pembatasan Koneksi HTTP (port 80): Untuk port HTTP, firewall membatasi jumlah koneksi baru (maksimum 10 koneksi) yang dapat diterima oleh server, untuk melindungi dari serangan DoS (Denial of Service). Koneksi lebih dari jumlah tersebut akan ditolak dengan memberikan reset TCP.
+
+Pencegahan Serangan Port Scan: Aturan firewall juga diterapkan untuk mendeteksi dan memblokir teknik pemindaian port seperti XMAS scan, NULL scan, dan SYN flood. Hal tersebut memberikan pertahanan terhadap teknik pemetaan port yang digunakan oleh penyerang untuk menemukan celah di sistem.
+
+SYN Flood Mitigation: Firewall mendeteksi serangan SYN flood yang sering digunakan dalam serangan DoS. Jika terlalu banyak koneksi SYN baru diterima dalam waktu singkat, firewall akan memblokirnya.
+
+#### 2. ACL (Access Control List)
+ACL adalah teknik yang digunakan untuk membatasi akses ke sumber daya tertentu dalam jaringan. ACL diterapkan pada level jaringan dan sistem untuk membatasi siapa yang dapat mengakses port atau layanan tertentu.
+
+Kontrol Akses pada Port 22 (SSH): ACL digunakan untuk mengontrol siapa saja yang dapat mengakses port SSH pada server. Aturan firewall membatasi akses SSH hanya untuk alamat IP tertentu, sehingga hanya perangkat yang dikenal yang dapat masuk dan terhubung ke server. Hal tersebut digunakan untuk mengurangi risiko akses tidak sah.
+
+Kontrol Akses Jaringan: Selain kontrol di tingkat aplikasi (seperti port 22 dan 80), ACL juga diterapkan untuk mengontrol akses ke subnet dan jaringan yang lebih besar dengan menentukan rute yang dapat diakses antar subnet (misalnya, ```route add -net 192.243.1.72 netmask 255.255.255.252 gw 192.243.1.78```).
+
+3. Segmentasi Jaringan
+Segmentasi jaringan adalah proses membagi jaringan besar menjadi beberapa segmen atau subnet yang lebih kecil untuk meningkatkan kinerja dan keamanan. Dengan membagi jaringan, akses antara berbagai bagian jaringan dapat terkontrol dengan baik, membatasi potensi penyebaran ancaman, dan memastikan bahwa hanya pihak yang berwenang yang bisa mengakses sumber daya tertentu.
+
+Subnetting pada Jaringan: Berbagai perangkat dikelompokkan ke dalam subnet yang terpisah. Misalnya, perangkat di jaringan 192.243.1.0/26 dipisahkan dari jaringan lain, dan ada pembagian lebih lanjut seperti di jaringan 192.243.0.0/24 untuk membatasi komunikasi antara jaringan yang berbeda.
+
+Segmentasi berdasarkan Fungsi: Subnet yang berbeda juga digunakan untuk memisahkan berbagai jenis perangkat atau fungsi, seperti server (perpus-6), router (dptsi), dan perangkat lain di jaringan. Hal ini memastikan bahwa perangkat dengan fungsi yang berbeda tidak berkomunikasi langsung kecuali diperlukan.
+
+Keamanan Berlapis: Segmentasi jaringan memperkenalkan keamanan berlapis, di mana perangkat atau jaringan yang lebih sensitif (misalnya, server) dapat ditempatkan di segmen terpisah dengan kontrol akses yang lebih ketat, sementara perangkat lain (seperti workstation atau perangkat pengguna) ditempatkan di subnet yang berbeda dengan pembatasan yang sesuai.
 
 ## Topologi Subnetting
 <img width="539" alt="image" src="https://github.com/user-attachments/assets/5b283561-d867-4f7c-9cf2-98b0d18a8745" />
